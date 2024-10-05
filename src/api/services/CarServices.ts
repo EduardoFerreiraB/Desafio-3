@@ -1,18 +1,20 @@
 import  Car  from '../models/CarModel';
 import { CarDTO } from '../dtos/CarDTO';
 import { AppDataSource } from '../../database/data-source';
-import Acessory from '../models/AcessoryModel';
 import CarRepository from '../repositories/CarRepository';
 import { PaginateCarDTO } from '../dtos/PaginateCarDTO';
+import AppError from '../errors/AppError';
+
 
 interface IRequest {
     model: string;
     color: string;
     year: number;
     valuePerDay: number;
-    acessories?: Acessory[];
+    acessories: { name: string }[];
     numberOfPassengers: number;
 }
+
 
 interface IListCarRequest {
     model?: string;
@@ -24,6 +26,7 @@ interface IListCarRequest {
     offset?: number;
 }
 
+
 export default class CarService {
     private carRepository: CarRepository;
 
@@ -34,12 +37,13 @@ export default class CarService {
     async create({ model, color, year, valuePerDay, acessories, numberOfPassengers }: IRequest): Promise<CarDTO> {
         const carRepository = AppDataSource.getRepository(Car);
 
+        const accessories = acessories.map(accessory => accessory.name);
         const car = carRepository.create({
             model,
             color,
             year,
             valuePerDay,
-            acessories,
+            acessories: accessories,
             numberOfPassengers,
         });
 
@@ -78,17 +82,92 @@ export default class CarService {
             return new PaginateCarDTO(carsDTO, total, limit, offset);
     }
 
+    async findId(id: number): Promise<CarDTO> {
+        const carRepository = AppDataSource.getRepository(Car);
+
+        const car = await carRepository.findOne({where: { id }});
+
+        if (!car) {
+            throw new Error('Car not found');
+        }
+
+        return new CarDTO(car);
+    }
+
     async delete(id: number): Promise<void> {
         const carRepository = AppDataSource.getRepository(Car);
 
         const car = await carRepository.findOneBy({ id });
 
         if (!car) {
-            throw new Error("Car doesnt exists!");
+            throw new AppError("Car doesnt exists!");
         }
 
         await carRepository.remove(car);
 
+    }
+
+    async update(id: number, { model, color, year, valuePerDay, acessories, numberOfPassengers }: IRequest):
+    Promise<CarDTO> {
+
+        const carRepository = AppDataSource.getRepository(Car);
+
+        const car = await carRepository.findOneBy({ id });
+
+        if (!car) {
+            throw new Error("Car not found");
+        }
+
+        car.model = model || car.model;
+        car.color = color || car.color;
+        car.year = year || car.year;
+        car.valuePerDay = valuePerDay || car.valuePerDay;
+        car.numberOfPassengers = numberOfPassengers || car.numberOfPassengers;
+
+        if (acessories && Array.isArray(acessories)) {
+            car.acessories = acessories.map(accessory => {
+                if (typeof accessory.name !== 'string') {
+                    throw new Error("Invalid accessory format. Name must be a string.");
+                }
+                return accessory.name;
+            });
+        }
+
+
+        await carRepository.save(car);
+        return new CarDTO(car);
+    }
+
+    async updateAcessory(id: number, {name}: {name: string}): Promise<CarDTO> {
+        const carRepository = AppDataSource.getRepository(Car);
+
+        const car = await carRepository.findOneBy({id});
+
+        if (!car) {
+            throw new Error("Car not found");
+        }
+
+        if (!name || !name.trim()) {
+            throw new Error("Accessory name is required");
+        }
+
+        const normalizedAccessory = name.trim().toLowerCase();
+        const normalizedAcessories = car.acessories.map(accessory => accessory.trim().toLowerCase());
+
+        const accessoryIndex = normalizedAcessories.indexOf(normalizedAccessory);
+
+        if (accessoryIndex !== -1) {
+
+            car.acessories.splice(accessoryIndex, 1);
+        } else {
+            if (name && name.trim()) {
+                car.acessories.push(name.trim());
+            }
+        }
+
+        await carRepository.save(car);
+
+        return new CarDTO(car);
     }
 
     // Outros métodos como listar, atualizar e remover podem ser adicionados aqui.

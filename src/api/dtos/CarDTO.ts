@@ -1,6 +1,5 @@
 // src/modules/CAR/dtos/CarDTO.ts
 import Car from '../models/CarModel';
-import Acessory from '../models/AcessoryModel';
 
 export class CarDTO {
     public id: number;
@@ -8,7 +7,7 @@ export class CarDTO {
     public color: string;
     public year: number;
     public valuePerDay: number;
-    public accessories: string[]; // Array de objetos Acessory
+    public acessories: {name: string}[];
     public numberOfPassengers: number;
 
     constructor(car: Car) {
@@ -17,7 +16,7 @@ export class CarDTO {
         this.color = car.color;
         this.year = car.year;
         this.valuePerDay = car.valuePerDay;
-        this.accessories = car.acessories.map((accesory: Acessory) => accesory.name); // Acessory[] agora está correto
+        this.acessories = car.acessories.map(accesory => ({ name: accesory}));
         this.numberOfPassengers = car.numberOfPassengers;
     }
 }

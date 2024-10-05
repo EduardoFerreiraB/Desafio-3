@@ -1,5 +1,4 @@
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import Acessory from "./AcessoryModel";
 import Reserve from "./ReserveModel";
 
 
@@ -24,15 +23,12 @@ class Car {
     @Column()
     numberOfPassengers: number;
 
-    @OneToMany(() => Acessory, (acessory) => acessory.car, {
-        cascade: true,
-        eager: true,
-    })
-    acessories: Acessory[];
+    @Column("simple-array")
+    acessories: string[];
 
     @OneToMany(() => Reserve, (reserve) => reserve.car, {
-        cascade: true,
-        eager: true
+        //cascade: true,
+        //eager: true
     })
     reserves: Reserve[];
 

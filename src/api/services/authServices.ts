@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import auth from '../config/auth';
 
-export const generateToken = (user_id: string) => {
+export const generateToken = (user_id: number) => {
     return jwt.sign({ id: user_id}, auth.jwt.secret, {
         expiresIn: auth.jwt.expiresIn,
     });

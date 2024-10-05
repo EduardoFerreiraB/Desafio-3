@@ -17,8 +17,29 @@ class Users {
     @Column()
     birth: Date
 
+    @Column({ default: true})
+    qualified: boolean
+
     @Column()
     cep: string
+
+    @Column()
+    neighbordhood: string
+
+    @Column()
+    street: string
+
+    @Column({ nullable: true})
+    complement: string
+
+    @Column()
+    city: string
+
+    @Column()
+    uf: string
+
+    @Column()
+    email: string
 
     @Column()
     password: string
