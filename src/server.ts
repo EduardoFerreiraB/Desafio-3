@@ -1,7 +1,10 @@
+import * as dotenv from 'dotenv';
 import express from "express";
 import { AppDataSource } from "./database/data-source";
 import routes from "./routes/routes";
 import { errors } from "celebrate";
+
+dotenv.config();
 
 const app = express();
 

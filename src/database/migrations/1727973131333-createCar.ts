@@ -29,6 +29,12 @@ export class CreateCar1727973131333 implements MigrationInterface {
                         type: 'decimal'
                     },
                     {
+                        name: "accessories",
+                        type: "text",
+                        isArray: true,
+                        isNullable: true,
+                    },
+                    {
                         name: 'numberOfPassengers',
                         type: 'int'
                     },

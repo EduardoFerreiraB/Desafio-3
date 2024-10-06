@@ -26,11 +26,37 @@ export class CreateUser1727977021359 implements MigrationInterface {
                         type: 'date',
                     },
                     {
+                        name: 'qualified',
+                        type: 'boolean',
+                        default: true
+                    },
+                    {
                         name: 'cep',
                         type: 'varchar',
                     },
                     {
-                         name: 'email',
+                        name: "neighbordhood",
+                        type: "varchar",
+                    },
+                    {
+                        name: "street",
+                        type: "varchar",
+                    },
+                    {
+                        name: "complement",
+                        type: "varchar",
+                        isNullable: true
+                    },
+                    {
+                        name: "city",
+                        type: "varchar",
+                    },
+                    {
+                        name: "uf",
+                        type: "varchar",
+                    },
+                    {
+                        name: 'email',
                         type: 'varchar',
                         isUnique: true,
                     },

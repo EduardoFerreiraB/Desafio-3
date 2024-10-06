@@ -11,4 +11,9 @@ carRoutes.get('/car', carController.list);
 
 carRoutes.delete('/car/:id', carController.delete);
 
+carRoutes.get('/car/:id', carController.findId);
+
+carRoutes.put('/car/:id', carController.update);
+
+carRoutes.patch('/car/:id', carController.updateAcessory);
 export default carRoutes;

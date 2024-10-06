@@ -24,8 +24,7 @@ export default class CarRepository {
         limit = 10,
         offset = 0,
     }: IListCarRequest): Promise<Car[]> {
-        const queryBuilder = this.carRepository.createQueryBuilder('car')
-            .leftJoinAndSelect('car.acessories', 'acessories');
+        const queryBuilder = this.carRepository.createQueryBuilder('car');
 
         if (model) {
             queryBuilder.andWhere('car.model = :model', { model });

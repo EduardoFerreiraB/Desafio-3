@@ -5,15 +5,18 @@ export const authenticateToken = (req: Request, res: Response, next: NextFunctio
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
 
-    if(!token){
-        return res.sendStatus(401);
+    if (!token) {
+        return res.status(401).json({ message: 'Token not provided' });
     }
 
     try {
-        const decoded = verifyToken(token);
-        req.userId = (decoded as {id: string}).id;
+        const decoded = verifyToken(token) as { id: number }; // Definindo tipo esperado
+        req.user = { id: decoded.id };
         next();
-    } catch (err) {
-        return res.sendStatus(403).send(err);
+    } catch (error) {
+        if (error instanceof Error) {
+            return res.status(403).json({ message: 'Invalid token' });
+        }
+        return res.status(500).json({message: "Internal server error"});
     }
 }
