@@ -11,12 +11,12 @@ export const authenticateToken = (req: Request, res: Response, next: NextFunctio
 
     try {
         const decoded = verifyToken(token) as { id: number }; // Definindo tipo esperado
-        req.userId = decoded.id;
+        req.user = { id: decoded.id };
         next();
     } catch (error) {
-            if (error instanceof Error) {
-                return res.status(403).json({ message: 'Invalid token' });
-            }
+        if (error instanceof Error) {
+            return res.status(403).json({ message: 'Invalid token' });
+        }
         return res.status(500).json({message: "Internal server error"});
     }
 }

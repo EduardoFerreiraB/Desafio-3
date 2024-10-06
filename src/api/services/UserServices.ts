@@ -117,4 +117,29 @@ export default class UserService {
 
         return new UserDTO(user);
     }
+
+    async findId(id: number): Promise<UserDTO> {
+        const carRepository = AppDataSource.getRepository(Users);
+
+        const user = await carRepository.findOne({where: { id }});
+
+        if (!user) {
+            throw new Error('Car not found');
+        }
+
+        return new UserDTO(user);
+    }
+
+    async delete(id: number): Promise<void> {
+        const userRepository = AppDataSource.getRepository(Users);
+
+        const user = await userRepository.findOneBy({ id });
+
+        if (!user) {
+            throw new Error("User doesnt exists!");
+        }
+
+        await userRepository.remove(user);
+
+    }
 }
