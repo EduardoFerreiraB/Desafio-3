@@ -1,0 +1,516 @@
+openapi: 3.0.0
+info:
+  title: API Locação de Veiculos
+  description: API para gerenciar carros, usuários e reservas.
+  version: 1.0.0
+  contact:
+    name: Eduardo Ferreira
+    email: eduardoferreirabmatos@gmail.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+servers:
+  - url: http://localhost:3000
+    description: Servidor Local
+
+components:
+  schemas:
+    Car:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        model:
+          type: string
+          example: "Tesla Model S"
+        color:
+          type: string
+          example: "Red"
+        year:
+          type: integer
+          example: 2022
+        valuePerDay:
+          type: number
+          format: float
+          example: 150.0
+        numberOfPassengers:
+          type: integer
+          example: 5
+        acessories:
+          type: array
+          items:
+            type: string
+          example: ["GPS", "Air Conditioner", "Sunroof"]
+        reserves:
+          type: array
+          items:
+            $ref: '#/components/schemas/Reserve'
+        createdAt:
+          type: string
+          format: date-time
+          example: "2023-10-08T15:30:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          example: "2023-10-08T16:30:00Z"
+    
+    CarInput:
+      type: object
+      properties:
+        model:
+          type: string
+          example: "Tesla Model S"
+        color:
+          type: string
+          example: "Red"
+        year:
+          type: integer
+          example: 2022
+        valuePerDay:
+          type: number
+          format: float
+          example: 150.0
+        numberOfPassengers:
+          type: integer
+          example: 5
+        acessories:
+          type: array
+          items:
+            type: string
+          example: ["GPS", "Air Conditioner", "Sunroof"]
+    
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "John Doe"
+        cpf:
+          type: string
+          example: "123.456.789-00"
+        birth:
+          type: string
+          format: date
+          example: "1990-01-01"
+        qualified:
+          type: boolean
+          example: true
+        cep:
+          type: string
+          example: "12345-678"
+        neighbordhood:
+          type: string
+          example: "Downtown"
+        street:
+          type: string
+          example: "123 Main St"
+        complement:
+          type: string
+          example: "Apartment 301"
+        city:
+          type: string
+          example: "São Paulo"
+        uf:
+          type: string
+          example: "SP"
+        email:
+          type: string
+          example: "john.doe@example.com"
+        password:
+          type: string
+          format: password
+          example: "strongpassword123"
+        reserves:
+          type: array
+          items:
+            $ref: '#/components/schemas/Reserve'
+        createdAt:
+          type: string
+          format: date-time
+          example: "2023-10-08T15:30:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          example: "2023-10-08T16:30:00Z"
+          
+          
+    UserInput:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "John Doe"
+        cpf:
+          type: string
+          example: "123.456.789-00"
+        birth:
+          type: string
+          format: date
+          example: "1990-01-01"
+        cep:
+          type: string
+          example: "12345-678"
+        email:
+          type: string
+          example: "john.doe@example.com"
+        password:
+          type: string
+          format: password
+          example: "strongpassword123"
+    
+    Reserve:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        startDate:
+          type: string
+          format: date
+          example: "2024-01-01"
+        endDate:
+          type: string
+          format: date
+          example: "2024-01-10"
+        finalValues:
+          type: number
+          format: float
+          example: 1500.0
+        user:
+          $ref: '#/components/schemas/User'
+        car:
+          $ref: '#/components/schemas/Car'
+        createdAt:
+          type: string
+          format: date-time
+          example: "2023-10-08T15:30:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          example: "2023-10-08T16:30:00Z"
+    
+    ReserveInput:
+      type: object
+      properties:
+        startDate:
+          type: string
+          format: date
+          example: "2024-01-01"
+        endDate:
+          type: string
+          format: date
+          example: "2024-01-10"
+        carId:
+          type: number
+          example: 1
+
+paths:
+  /v1/car:
+    post:
+      summary: Cria um novo carro
+      tags:
+        - Car
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CarInput'
+      responses:
+        '201':
+          description: Carro criado com sucesso
+        '400':
+          description: Erro na validação
+    get:
+      summary: Lista todos os carros
+      tags:
+        - Car
+      responses:
+        '200':
+          description: Lista de carros
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Car'
+
+  /v1/car/{id}:
+    get:
+      summary: Retorna um carro específico
+      tags:
+        - Car
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: ID do carro
+      responses:
+        '200':
+          description: Detalhes do carro
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Car'
+        '404':
+          description: Carro não encontrado
+
+    delete:
+      summary: Remove um carro
+      tags:
+        - Car
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: ID do carro
+      responses:
+        '204':
+          description: Carro removido com sucesso
+        '404':
+          description: Carro não encontrado
+
+    put:
+      summary: Atualiza um carro
+      tags:
+        - Car
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: ID do carro
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CarInput'
+      responses:
+        '200':
+          description: Carro atualizado com sucesso
+        '404':
+          description: Carro não encontrado
+
+    patch:
+      summary: Atualiza um acessório do carro
+      tags:
+        - Car
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: ID do carro
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                acessories:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '200':
+          description: Acessórios atualizados com sucesso
+        '404':
+          description: Carro não encontrado
+
+  /v1/user:
+    post:
+      summary: Cria um novo usuário
+      tags:
+        - User
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserInput'
+      responses:
+        '201':
+          description: Usuário criado com sucesso
+        '400':
+          description: Erro na validação
+
+  /v1/auth:
+    post:
+      summary: Autentica um usuário
+      tags:
+        - User
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Autenticação bem-sucedida
+        '401':
+          description: Credenciais inválidas
+
+  /v1/user/{id}:
+    get:
+      summary: Retorna um usuário específico
+      tags:
+        - User
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: ID do usuário
+      responses:
+        '200':
+          description: Detalhes do usuário
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: Usuário não encontrado
+        '401':
+          description: Não autorizado
+
+    put:
+      summary: Atualiza um usuário
+      tags:
+        - User
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: ID do usuário
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserInput'
+      responses:
+        '200':
+          description: Usuário atualizado com sucesso
+        '404':
+          description: Usuário não encontrado
+        '401':
+          description: Não autorizado
+
+    delete:
+      summary: Remove um usuário
+      tags:
+        - User
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: ID do usuário
+      responses:
+        '204':
+          description: Usuário removido com sucesso
+        '404':
+          description: Usuário não encontrado
+        '401':
+          description: Não autorizado
+
+  /v1/reserve:
+    post:
+      summary: Cria uma nova reserva
+      tags:
+        - Reserve
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReserveInput'
+      responses:
+        '201':
+          description: Reserva criada com sucesso
+        '400':
+          description: Erro na validação
+
+  /v1/reserve/{id}:
+    get:
+      summary: Retorna uma reserva específica
+      tags:
+        - Reserve
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: ID da reserva
+      responses:
+        '200':
+          description: Detalhes da reserva
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reserve'
+        '404':
+          description: Reserva não encontrada
+
+    delete:
+      summary: Remove uma reserva
+      tags:
+        - Reserve
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: ID da reserva
+      responses:
+        '204':
+          description: Reserva removida com sucesso
+        '404':
+          description: Reserva não encontrada
+
+    put:
+      summary: Atualiza uma reserva
+      tags:
+        - Reserve
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: ID da reserva
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Reserve'
+      responses:
+        '200':
+          description: Reserva atualizada com sucesso
+        '404':
+          description: Reserva não encontrada
