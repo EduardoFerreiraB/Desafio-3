@@ -155,7 +155,7 @@ export default class UserService {
         const user = await userRepository.findOne({where: { id }});
 
         if (!user) {
-            throw new BusinessError('Car not found');
+            throw new BusinessError('User not found');
         }
 
         return new UserDTO(user);
