@@ -169,6 +169,4 @@ export default class CarService {
 
         return new CarDTO(car);
     }
-
-    // Outros métodos como listar, atualizar e remover podem ser adicionados aqui.
 }

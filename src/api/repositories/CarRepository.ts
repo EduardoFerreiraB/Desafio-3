@@ -1,4 +1,3 @@
-// src/modules/CAR/repositories/CarRepository.ts
 import { AppDataSource } from "../../database/data-source";
 import Car from "../models/CarModel";
 
@@ -42,7 +41,7 @@ export default class CarRepository {
             queryBuilder.andWhere('car.numberOfPassengers = :numberOfPassengers', { numberOfPassengers });
         }
 
-        queryBuilder.skip(offset).take(limit); // Para paginação
+        queryBuilder.skip(offset).take(limit);
 
         return await queryBuilder.getMany();
     }
