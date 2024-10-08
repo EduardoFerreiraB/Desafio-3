@@ -27,8 +27,7 @@ class Car {
     acessories: string[];
 
     @OneToMany(() => Reserve, (reserve) => reserve.car, {
-        //cascade: true,
-        //eager: true
+        cascade: true,
     })
     reserves: Reserve[];
 

@@ -44,7 +44,9 @@ class Users {
     @Column()
     password: string
 
-    @OneToMany(() => Reserve, (reserve) => reserve.user)
+    @OneToMany(() => Reserve, (reserve) => reserve.user, {
+        cascade: true
+    })
     reserves: Reserve[];
 
     @CreateDateColumn()

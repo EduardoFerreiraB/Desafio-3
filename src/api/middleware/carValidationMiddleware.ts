@@ -2,11 +2,11 @@ import { celebrate, Joi, Segments } from "celebrate";
 
 export const createCarValidation = celebrate({
     [Segments.BODY]: Joi.object().keys({
-        model: Joi.string().required(),
-        color: Joi.string().required(),
+        model: Joi.string().min(5).max(50).required(),
+        color: Joi.string().min(5).max(20).required(),
         year: Joi.number().integer().min(1950).max(2023).required(),
-        valuePerDay: Joi.number().required(),
-        numberOfPassengers: Joi.number().required(),
+        valuePerDay: Joi.number().min(0).required(),
+        numberOfPassengers: Joi.number().min(1).required(),
         acessories: Joi.array().items(
             Joi.object({
                 name: Joi.string().required(),

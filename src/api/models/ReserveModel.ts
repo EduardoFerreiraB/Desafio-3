@@ -18,12 +18,12 @@ class Reserve {
     @Column()
     finalValues: number
 
-    @ManyToOne(() => Users, (user) => user.reserves)
-    @JoinColumn({ name: 'user_id '})
+    @ManyToOne(() => Users, (user) => user.reserves, {onDelete: 'CASCADE'})
+    @JoinColumn({ name: 'user_id'})
     user: Users;
 
-    @ManyToOne(() => Car)
-    @JoinColumn({ name: 'car_id '})
+    @ManyToOne(() => Car, {onDelete: 'CASCADE'})
+    @JoinColumn({ name: 'car_id'})
     car: Car
 
     @CreateDateColumn()

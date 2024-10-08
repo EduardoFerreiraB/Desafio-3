@@ -1,5 +1,6 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import CarServices from "../services/CarServices";
+import { BusinessError } from '../errors/AppError';
 
 interface CarQuery {
     model?: string;
@@ -51,38 +52,50 @@ export default class CarController {
         }
     }
 
-    public async findId(req: Request, res: Response): Promise<Response> {
-        const carService = new CarServices();
+    public async findId(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
         const { id } = req.params;
-
+        const carId = Number(id);
         try {
-            const car = await carService.findId(Number(id));
-            return res.status(200).json(car);
-        }catch (error) {
-            if (error instanceof Error) {
-                return res.status(404).json({message: error.message});
+            const carService = new CarServices();
+
+            if (isNaN(carId)) {
+                throw new BusinessError("O id informado deve ser um número!")
             }
 
-            return res.status(500).json({message: "Internal server error"});
+            const car = await carService.findId(carId);
+            return res.status(200).json(car);
+        }catch (error) {
+            next(error);
         }
     }
 
-    public async delete(req: Request, res: Response): Promise<Response> {
+    public async delete(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
         const { id } = req.params;
+        const carId = Number(id);
+        try {
+            const deleteCar = new CarServices();
 
-        const deleteCar = new CarServices();
+            if (isNaN(carId)) {
+                throw new BusinessError("O id informado deve ser um número!")
+            }
 
-        await deleteCar.delete(Number(id));
+            await deleteCar.delete(carId);
 
-        return res.status(204).send();
+            return res.status(204).send();
+        } catch(error) {
+            next(error);
+        }
     }
 
-    public async update(req: Request, res: Response): Promise<Response> {
+    public async update(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
         const { id } = req.params;
         const { model, color, year, valuePerDay, acessories, numberOfPassengers } = req.body;
         const carId = Number(id);
         try {
             const carService = new CarServices();
+            if (isNaN(carId)) {
+                throw new BusinessError("O id informado deve ser um número!");
+            }
             const updateCar = await carService.update(carId, {
                 model,
                 color,
@@ -94,29 +107,24 @@ export default class CarController {
 
             return res.status(200).json(updateCar);
         } catch (error) {
-            if (error instanceof Error) {
-                return res.status(400).json({message: error.message});
-            }
-
-            return res.status(500).json({message: "Internal server error"});
+            next(error);
         }
     }
 
-    public async updateAcessory(req: Request, res: Response): Promise<Response> {
+    public async updateAcessory(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
         const { id } = req.params;
         const { name } = req.body;
         const carId = Number(id);
         const carService = new CarServices();
 
         try {
+            if (isNaN(carId)) {
+                throw new BusinessError("O id informado deve ser um número!");
+            }
             const updateCar = await carService.updateAcessory(carId, { name });
             return res.status(200).json(updateCar);
         } catch (error) {
-            if (error instanceof Error) {
-                return res.status(400).json({message: error.message});
-            }
-
-            return res.status(500).json({message: "Internal server error"});
+            next(error);
         }
     }
 }

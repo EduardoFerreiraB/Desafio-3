@@ -1,22 +1,41 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import UserService from '../services/UserServices';
+import { BusinessError, UnauthorizedError } from '../errors/AppError';
 
 export default class UserController {
-    public async create(req: Request, res: Response): Promise<Response> {
-        const userService = new UserService();
-
+    public async create(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
         const { name, cpf, birth, cep, email, password } = req.body;
+        try {
+            const userService = new UserService();
 
-        const user = await userService.create({
-            name,
-            cpf,
-            birth,
-            cep,
-            email,
-            password
-        });
+            const validateCPF = (cpf: string): boolean => {
+                cpf = cpf.replace(/[^\d]+/g, '');
 
-        return res.status(201).json(user);
+                if (cpf.length !== 11 || /^(\d)\1+$/.test(cpf)) {
+                    return false;
+                }
+
+                return true;
+            }
+
+            if (!validateCPF(cpf)) {
+                throw new BusinessError("CPF is not valid!");
+            }
+
+            const user = await userService.create({
+                name,
+                cpf,
+                birth,
+                cep,
+                email,
+                password
+            });
+
+            return res.status(201).json(user);
+        } catch (error) {
+            next(error);
+        }
+
     }
 
     public async authenticate(req: Request, res: Response): Promise<Response> {
@@ -29,18 +48,18 @@ export default class UserController {
         return res.status(201).json({accesToken: token});
     }
 
-    public async update(req: Request, res: Response): Promise<Response> {
+    public async update(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
         const userService = new UserService();
         const { id } = req.params;
         const userId = Number(id);
         const authenticatedUser = req.user.id;
         const { name, cpf, birth, cep, email } = req.body;
 
-        if (userId !== authenticatedUser) {
-            return res.status(403).json({message: "You are not allowed to update this user"});
-        }
 
         try {
+            if (userId !== authenticatedUser) {
+                throw new UnauthorizedError("You are not allowed to update this user");
+            }
             const updateUser = await userService.update(userId, {
                 name,
                 cpf,
@@ -51,55 +70,42 @@ export default class UserController {
 
             return res.status(200).json(updateUser);
         } catch (error) {
-            if (error instanceof Error) {
-                return res.status(400).json({message: error.message});
-            }
-
-            return res.status(500).json({message: "Internal server error"});
+            next(error);
         }
 
     }
 
-    public async findId(req: Request, res: Response): Promise<Response> {
+    public async findId(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
         const userService = new UserService();
         const { id } = req.params;
         const userId = Number(id);
         const authenticatedUser = req.user.id;
 
-        if (userId !== authenticatedUser) {
-            return res.status(403).json({message: "You are not allowed to view this user"});
-        }
         try {
-            const user = await userService.findId(Number(id));
+            if (userId !== authenticatedUser) {
+                throw new UnauthorizedError("You are not allowed to view this user");
+            }
+            const user = await userService.findId(userId);
             return res.status(200).json(user);
         }catch (error) {
-            if (error instanceof Error) {
-                return res.status(404).json({message: error.message});
-            }
-
-            return res.status(500).json({message: "Internal server error"});
+            next(error)
         }
     }
 
-    public async delete(req: Request, res: Response): Promise<Response> {
-        const userService = new UserService();
+    public async delete(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
         const { id } = req.params;
         const userId = Number(id);
         const authenticatedUser = req.user.id;
 
-        if (userId !== authenticatedUser) {
-            return res.status(403).json({message: "You are not allowed to delete this user"});
-        }
-
         try {
-            await userService.delete(Number(id));
+            if (userId !== authenticatedUser) {
+               throw new UnauthorizedError("You are not allowed to delete this user");
+            }
+            const userService = new UserService();
+            await userService.delete(userId);
             return res.status(204).send();
         }catch (error) {
-            if (error instanceof Error) {
-                return res.status(404).json({message: "error.message"});
-            }
-
-            return res.status(500).json({message: "Internal server error"});
+            next(error);
         }
 
     }

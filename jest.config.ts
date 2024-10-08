@@ -1,11 +1,16 @@
-// jest.config.ts
-import type { Config } from 'jest';
-
-const config: Config = {
+export default {
   preset: 'ts-jest',
   testEnvironment: 'node',
+  collectCoverage: true,
+  coverageDirectory: 'coverage',
+  coverageReporters: ['html'],
+  coverageThreshold: {
+    global: {
+      branches: 70,
+      functions: 70,
+      lines: 70,
+      statements: 70,
+    },
+  },
   moduleFileExtensions: ['ts', 'js', 'json', 'node'],
-  testPathIgnorePatterns: ['/node_modules/', '/dist/'],
 };
-
-export default config;

@@ -3,7 +3,7 @@ import { CarDTO } from '../dtos/CarDTO';
 import { AppDataSource } from '../../database/data-source';
 import CarRepository from '../repositories/CarRepository';
 import { PaginateCarDTO } from '../dtos/PaginateCarDTO';
-import AppError from '../errors/AppError';
+import {AppError, IdError} from '../errors/AppError';
 
 
 interface IRequest {
@@ -88,7 +88,7 @@ export default class CarService {
         const car = await carRepository.findOne({where: { id }});
 
         if (!car) {
-            throw new Error('Car not found');
+            throw new IdError('Car doesnt exists!');
         }
 
         return new CarDTO(car);
@@ -100,7 +100,7 @@ export default class CarService {
         const car = await carRepository.findOneBy({ id });
 
         if (!car) {
-            throw new AppError("Car doesnt exists!");
+            throw new IdError("Car doesnt exists!");
         }
 
         await carRepository.remove(car);
@@ -115,7 +115,7 @@ export default class CarService {
         const car = await carRepository.findOneBy({ id });
 
         if (!car) {
-            throw new Error("Car not found");
+            throw new IdError("Car doesnt exists!");
         }
 
         car.model = model || car.model;
@@ -144,11 +144,11 @@ export default class CarService {
         const car = await carRepository.findOneBy({id});
 
         if (!car) {
-            throw new Error("Car not found");
+            throw new IdError("Car not found");
         }
 
         if (!name || !name.trim()) {
-            throw new Error("Accessory name is required");
+            throw new AppError("Accessory name is required");
         }
 
         const normalizedAccessory = name.trim().toLowerCase();
